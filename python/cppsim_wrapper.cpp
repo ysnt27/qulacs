@@ -1,3 +1,4 @@
+// clang-format off
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include <pybind11/complex.h>
@@ -60,6 +61,15 @@ PYBIND11_MODULE(qulacs_core, m) {
         .def("__mul__", [](const PauliOperator &a, std::complex<double> &b) { return a * b; }, py::is_operator())
         .def(py::self *= py::self)
         .def("__IMUL__", [](PauliOperator &a, std::complex<double> &b) { return a *= b; }, py::is_operator())
+        .def(py::pickle(
+            [](const PauliOperator &self) {
+                return py::make_tuple(self.get_pauli_string(), self.get_coef());
+            },
+            [](py::tuple t) {
+                assert(t.size() == 2);
+                return PauliOperator(t[0].cast<std::string>(), t[1].cast<CPPCTYPE>());
+            }
+        ))
         ;
 
     py::class_<GeneralQuantumOperator>(m, "GeneralQuantumOperator")
@@ -97,6 +107,22 @@ PYBIND11_MODULE(qulacs_core, m) {
         .def(py::self *= py::self)
         .def("__IMUL__", [](GeneralQuantumOperator &a, const PauliOperator &b) { return a *= b; }, py::is_operator())
         .def("__IMUL__", [](GeneralQuantumOperator &a, std::complex<double> &b) { return a *= b; }, py::is_operator())
+        .def(py::pickle(
+            [](const GeneralQuantumOperator& self) {
+                std::vector<PauliOperator*> terms = self.get_terms();
+                std::vector<PauliOperator> term_objects;
+                std::transform(terms.begin(), terms.end(), std::back_inserter(term_objects), [](auto p) { return *p; });
+                return py::make_tuple(self.get_qubit_count(), term_objects);
+            },
+            [](py::tuple t) {
+                assert(t.size() == 2);
+                GeneralQuantumOperator ret(t[0].cast<UINT>());
+                for(auto op : t[1].cast<std::vector<PauliOperator>>()) {
+                    ret.add_operator(&op);
+                }
+                return ret;
+            }
+        ))
         ;
     auto mquantum_operator = m.def_submodule("quantum_operator");
     mquantum_operator.def("create_quantum_operator_from_openfermion_file", &quantum_operator::create_general_quantum_operator_from_openfermion_file, pybind11::return_value_policy::take_ownership);
@@ -135,6 +161,22 @@ PYBIND11_MODULE(qulacs_core, m) {
         .def("apply_to_state", py::overload_cast<QuantumStateBase*, const QuantumStateBase&, QuantumStateBase*>(&HermitianQuantumOperator::apply_to_state, py::const_), "Apply observable to `state_to_be_multiplied`. The result is stored into `dst_state`.",
             py::arg("work_state"), py::arg("state_to_be_multiplied"), py::arg("dst_state"))
         .def("__str__", &HermitianQuantumOperator::to_string, "to string")
+        .def(py::pickle(
+            [](const HermitianQuantumOperator& self) {
+                std::vector<PauliOperator*> terms = self.get_terms();
+                std::vector<PauliOperator> term_objects;
+                std::transform(terms.begin(), terms.end(), std::back_inserter(term_objects), [](auto p) { return *p; });
+                return py::make_tuple(self.get_qubit_count(), term_objects);
+            },
+            [](py::tuple t) {
+                assert(t.size() == 2);
+                HermitianQuantumOperator ret(t[0].cast<UINT>());
+                for(auto op : t[1].cast<std::vector<PauliOperator>>()) {
+                    ret.add_operator(&op);
+                }
+                return ret;
+            }
+        ));
         ;
     auto mobservable = m.def_submodule("observable");
     mobservable.def("create_observable_from_openfermion_file", &observable::create_observable_from_openfermion_file, pybind11::return_value_policy::take_ownership);
@@ -178,7 +220,30 @@ PYBIND11_MODULE(qulacs_core, m) {
             return state.data_cpp()[index];
         }, "Get state vector", py::arg("index"))
         .def("get_qubit_count", [](const QuantumState& state) -> unsigned int {return (unsigned int) state.qubit_count; }, "Get qubit count")
-        .def("__repr__", [](const QuantumState &p) {return p.to_string();});
+        .def("__repr__", [](const QuantumState &p) {return p.to_string();})
+        .def(py::pickle(
+            [](const QuantumState& self) {
+                CPPCTYPE* data = self.data_cpp();
+                std::vector<CPPCTYPE> v(self.dim);
+                std::vector<UINT> classical_register = self.get_classical_register();
+                for(UINT i = 0; i < self.dim; i++) {
+                    v[i] = data[i];
+                }
+                return py::make_tuple(v, self.qubit_count, classical_register);
+            },
+            [](py::tuple t) {
+                assert(t.size() == 3);
+                std::vector<CPPCTYPE> v = t[0].cast<std::vector<CPPCTYPE>>();
+                UINT nqubit = t[1].cast<UINT>();
+                std::vector<UINT> classical_register = t[2].cast<std::vector<UINT>>();
+                QuantumState state(nqubit);
+                state.load(v);
+                for(UINT i = 0; i < classical_register.size(); i++) {
+                    state.set_classical_value(i, classical_register[i]);
+                }
+                return state;
+            }
+        ))
         ;
 
         m.def("StateVector", [](const unsigned int qubit_count) {
@@ -223,7 +288,30 @@ PYBIND11_MODULE(qulacs_core, m) {
             }
             return mat;
         }, "Get density matrix")
-        .def("__repr__", [](const DensityMatrix &p) {return p.to_string(); });
+        .def("__repr__", [](const DensityMatrix &p) {return p.to_string(); })
+        .def(py::pickle(
+            [](const DensityMatrix& self) {
+                CPPCTYPE* data = self.data_cpp();
+                std::vector<CPPCTYPE> v(self.dim * self.dim);
+                std::vector<UINT> classical_register = self.get_classical_register();
+                for(UINT i = 0; i < self.dim * self.dim; i++) {
+                    v[i] = data[i];
+                }
+                return py::make_tuple(v, self.qubit_count, classical_register);
+            },
+            [](py::tuple t) {
+                assert(t.size() == 3);
+                std::vector<CPPCTYPE> v = t[0].cast<std::vector<CPPCTYPE>>();
+                UINT nqubit = t[1].cast<UINT>();
+                std::vector<UINT> classical_register = t[2].cast<std::vector<UINT>>();
+                DensityMatrix state(nqubit);
+                state.load(v);
+                for(UINT i = 0; i < classical_register.size(); i++) {
+                    state.set_classical_value(i, classical_register[i]);
+                }
+                return state;
+            }
+        ))
         ;
 
 #ifdef _USE_GPU
