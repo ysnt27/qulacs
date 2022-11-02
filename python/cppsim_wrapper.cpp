@@ -208,7 +208,35 @@ PYBIND11_MODULE(qulacs_core, m) {
             return state.data_cpp()[index];
         }, "Get state vector", py::arg("index"))
         .def("get_qubit_count", [](const QuantumState& state) -> unsigned int {return (unsigned int) state.qubit_count; }, "Get qubit count")
-        .def("__repr__", [](const QuantumState &p) {return p.to_string();});
+        .def("__repr__", [](const QuantumState &p) {return p.to_string();})
+        .def(py::pickle(
+            [](const QuantumState& self) {
+                CPPCTYPE* data = self.data_cpp();
+                std::vector<CPPCTYPE> v(self.dim);
+                std::vector<UINT> classical_register = self.get_classical_register();
+                for(UINT i = 0; i < self.dim; i++) {
+                    v[i] = data[i];
+                }
+                return py::make_tuple(v, self.qubit_count, classical_register);
+            },
+            [](py::tuple t) {
+                assert(t.size() == 3);
+                std::vector<CPPCTYPE> v = t[0].cast<std::vector<CPPCTYPE>>();
+                UINT nqubit = t[1].cast<UINT>();
+                std::vector<UINT> classical_register = t[2].cast<std::vector<UINT>>();
+                QuantumState* state = new QuantumState(nqubit);
+                //QuantumState state(nqubit);
+                state->load(v);
+                for(UINT i = 0; i < classical_register.size(); i++) {
+                    state->set_classical_value(i, classical_register[i]);
+                }
+                std::cerr << state << '\n';
+                std::cerr << state << '\n';
+                std::cerr << state << '\n';
+                std::cerr << "=============\n";
+                return state;
+            }
+        ))        
         ;
 
         m.def("StateVector", [](const unsigned int qubit_count) {
