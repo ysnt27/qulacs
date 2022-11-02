@@ -60,6 +60,15 @@ PYBIND11_MODULE(qulacs_core, m) {
         .def("__mul__", [](const PauliOperator &a, std::complex<double> &b) { return a * b; }, py::is_operator())
         .def(py::self *= py::self)
         .def("__IMUL__", [](PauliOperator &a, std::complex<double> &b) { return a *= b; }, py::is_operator())
+        .def(py::pickle(
+            [](const PauliOperator &p) { // __getstate__
+                return py::make_tuple(p.get_pauli_string(), p.get_coef());
+            },
+            [](py::tuple t) { // __setstate__
+                return PauliOperator(
+                    t[0].cast<std::string>(), t[1].cast<CPPCTYPE>());
+            }
+        ))
         ;
 
     py::class_<GeneralQuantumOperator>(m, "GeneralQuantumOperator")
@@ -107,6 +116,14 @@ PYBIND11_MODULE(qulacs_core, m) {
         .def(py::self *= py::self)
         .def("__IMUL__", [](GeneralQuantumOperator &a, const PauliOperator &b) { return a *= b; }, py::is_operator())
         .def("__IMUL__", [](GeneralQuantumOperator &a, std::complex<double> &b) { return a *= b; }, py::is_operator())
+        .def(py::pickle(
+            [](const GeneralQuantumOperator &p) { // __getstate__
+                return py::make_tuple(p.get_qubit_count());
+            },
+            [](py::tuple t) { // __setstate__
+                return GeneralQuantumOperator(t[0].cast<int>());
+            }
+        ))
         ;
     auto mquantum_operator = m.def_submodule("quantum_operator");
     mquantum_operator.def("create_quantum_operator_from_openfermion_file", &quantum_operator::create_general_quantum_operator_from_openfermion_file, pybind11::return_value_policy::take_ownership);
