@@ -80,8 +80,8 @@ jobs:
       - name: Test in Ubuntu
         run: |
           cd ./build
-          make coverage
-          make pythontest
+          make coverage -j
+          make pythontest -j
 
       - name: Upload coverage to codecov
         uses: codecov/codecov-action@v3
@@ -131,7 +131,7 @@ jobs:
       - name: Test in Ubuntu
         run: |
           cd ./build
-          make test
+          make test -j
 
       - name: Show cache stats
         run: ccache -s
