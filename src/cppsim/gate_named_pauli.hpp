@@ -1,8 +1,7 @@
 #pragma once
 
-#include <csim/update_ops.hpp>
-#include <csim/update_ops_dm.hpp>
-
+#include "../csim/update_ops.hpp"
+#include "../csim/update_ops_dm.hpp"
 #include "gate.hpp"
 #include "pauli_operator.hpp"
 #include "state.hpp"

@@ -5,6 +5,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
+#include <cppsim/QASM.hpp>
 #include <cppsim/circuit.hpp>
 #include <cppsim/circuit_optimizer.hpp>
 #include <cppsim/gate_factory.hpp>
@@ -1184,6 +1185,8 @@ PYBIND11_MODULE(qulacs_core, m) {
             "__str__", [](const QuantumCircuit& p) { return p.to_string(); },
             "to string");
     ;
+
+    m.def("qulacs_to_QASM", &qulacs_to_QASM, py::arg("circuit"));
 
     py::class_<ParametricQuantumCircuit, QuantumCircuit>(
         m, "ParametricQuantumCircuit")

@@ -1,9 +1,9 @@
 #pragma once
 
 #include <cmath>
-#include <csim/update_ops.hpp>
-#include <csim/update_ops_dm.hpp>
 
+#include "../csim/update_ops.hpp"
+#include "../csim/update_ops_dm.hpp"
 #include "gate.hpp"
 #include "state.hpp"
 #include "utility.hpp"
@@ -300,6 +300,8 @@ public:
      *
      * @param state 更新する量子状態
      */
+
+    double get_angle(void) { return _angle; }
     virtual void update_quantum_state(QuantumStateBase* state) override {
         if (state->is_state_vector()) {
 #ifdef _USE_GPU

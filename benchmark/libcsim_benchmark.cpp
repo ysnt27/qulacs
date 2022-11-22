@@ -1,15 +1,16 @@
 ﻿#include <algorithm>
 #include <chrono>
-#include <csim/init_ops.hpp>
-#include <csim/memory_ops.hpp>
-#include <csim/stat_ops.hpp>
-#include <csim/update_ops.hpp>
-#include <csim/update_ops_cpp.hpp>
 #include <fstream>
 #include <functional>
 #include <iomanip>
 #include <iostream>
 #include <string>
+
+#include "../csim/init_ops.hpp"
+#include "../csim/memory_ops.hpp"
+#include "../csim/stat_ops.hpp"
+#include "../csim/update_ops.hpp"
+#include "../csim/update_ops_cpp.hpp"
 
 #ifdef _MSC_VER
 #include <intrin.h>
