@@ -48,7 +48,8 @@ jobs:
       - name: Setup ccache
         uses: hendrikmuhs/ccache-action@v1.2
         with:
-          key: ${{ github.job }}-${{ matrix.os }}
+          # Include compiler in cache key to distinguish cache for each compiler.
+          key: ${{ github.job }}-${{ matrix.os }}-${{ matrix.compiler }}
           verbose: 2
 
       - name: Install Boost for macOS
