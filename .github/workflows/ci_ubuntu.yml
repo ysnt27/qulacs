@@ -37,6 +37,7 @@ jobs:
         uses: hendrikmuhs/ccache-action@v1.2
         with:
           key: ${{ github.job }}-${{ matrix.os }}
+          verbose: 2
 
       - name: Setup Python
         uses: actions/setup-python@v4
