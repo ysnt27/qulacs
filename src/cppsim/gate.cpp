@@ -27,6 +27,7 @@ bool QuantumGateBase::is_commute(const QuantumGateBase* gate) const {
         }
     }
     // Note: gate1 control - gate2 control are always commuting
+    std::cout << "hoge" << std::endl;
     return true;
 }
 
