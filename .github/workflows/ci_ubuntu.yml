@@ -27,27 +27,22 @@ jobs:
       QULACS_OPT_FLAGS: "-mtune=haswell -march=haswell -mfpmath=both"
       PYTHON: ${{ matrix.python-version }}
       COVERAGE: "Yes"
-      CACHE_NAME: ccache-qulacs-build-v2
     steps:
       - uses: actions/checkout@v3
 
       - name: Setup cmake
         uses: lukka/get-cmake@latest
 
+      - name: Setup ccache
+        uses: hendrikmuhs/ccache-action@v1.2
+        with:
+          key: ${{ github.job }}-${{ matrix.os }}
+
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
-
-      - name: Install ccache
-        run: sudo apt install ccache
-
-      - name: Setup cache
-        uses: actions/cache@v3
-        with:
-          path: ~/.ccache
-          key: ${{ runner.os }}-${{ env.CACHE_NAME }}
 
       - name: Install boost
         run: sudo apt install libboost-dev
@@ -85,9 +80,6 @@ jobs:
 
       - name: Upload coverage to codecov
         uses: codecov/codecov-action@v3
-
-      - name: Show cache stats
-        run: ccache -s
 
   gcc10-build-with-address-sanitizer:
     name: GCC10 build with -fsanitizer=address enabled
