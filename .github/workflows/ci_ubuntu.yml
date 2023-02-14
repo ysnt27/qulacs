@@ -45,6 +45,10 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
+          cache: pip
+          # cache-dependency-path is used for computing cache key.
+          # If this file is not changed, cached dependencies are used.
+          cache-dependency-path: pyproject.toml
 
       - name: Install boost
         run: sudo apt install libboost-dev
@@ -143,6 +147,8 @@ jobs:
         with:
           python-version: "3.7.5"
           architecture: x64
+          cache: pip
+          cache-dependency-path: pyproject.toml
 
       - name: Install boost
         run: sudo apt install libboost-dev

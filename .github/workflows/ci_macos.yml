@@ -52,6 +52,8 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           architecture: x64
+          cache: pip
+          cache-dependency-path: pyproject.toml
 
       - name: Install Boost for macOS
         run: |
