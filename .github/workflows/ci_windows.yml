@@ -25,8 +25,6 @@ jobs:
     env:
       CXX_COMPILER: "g++-8"
       C_COMPILER: "gcc-8"
-      PYTHON: ${{ matrix.python-version }}
-      COVERAGE: "ON"
     steps:
       - uses: actions/checkout@v3
 

@@ -25,9 +25,7 @@ jobs:
       CXX_COMPILER: "/usr/lib/ccache/g++"
       C_COMPILER: "/usr/lib/ccache/gcc"
       QULACS_OPT_FLAGS: "-mtune=haswell -march=haswell -mfpmath=both"
-      PYTHON: ${{ matrix.python-version }}
       COVERAGE: "Yes"
-      CACHE_NAME: ccache-qulacs-build-v2
     steps:
       - uses: actions/checkout@v3
 
@@ -94,8 +92,6 @@ jobs:
       CXX_COMPILER: "/usr/lib/ccache/g++"
       C_COMPILER: "/usr/lib/ccache/gcc"
       QULACS_OPT_FLAGS: "-mtune=haswell -march=haswell -mfpmath=both"
-      PYTHON: ${{ matrix.python-version }}
-      CACHE_NAME: ccache-qulacs-build-v2
     steps:
       - uses: actions/checkout@v3
 
@@ -127,9 +123,6 @@ jobs:
       CXX_COMPILER: "/usr/lib/ccache/g++"
       C_COMPILER: "/usr/lib/ccache/gcc"
       QULACS_OPT_FLAGS: "-mtune=haswell -march=haswell -mfpmath=both"
-      PYTHON: "3.7.5"
-      COVERAGE: "ON"
-      CACHE_NAME: ccache-qulacs-gpu-build-v2
     steps:
       - uses: actions/checkout@v3
 

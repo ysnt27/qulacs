@@ -32,8 +32,6 @@ jobs:
     env:
       C_COMPILER: ${{ matrix.c_compiler }}
       CXX_COMPILER: ${{ matrix.cxx_compiler }}
-      PYTHON: ${{ matrix.python-version }}
-      CACHE_NAME: "ccache-qulacs-build-v2"
     steps:
       - uses: actions/checkout@v3
 
