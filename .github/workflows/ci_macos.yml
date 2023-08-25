@@ -26,8 +26,8 @@ jobs:
             c_compiler: "/usr/local/opt/ccache/libexec/gcc-12"
             cxx_compiler: "/usr/local/opt/ccache/libexec/g++-12"
           - compiler: "clang"
-            c_compiler: "/usr/local/opt/ccache/libexec/clang"
-            cxx_compiler: "/usr/local/opt/ccache/libexec/clang++"
+            c_compiler: "clang"
+            cxx_compiler: "clang++"
     runs-on: "macos-13"
     env:
       C_COMPILER: ${{ matrix.c_compiler }}
