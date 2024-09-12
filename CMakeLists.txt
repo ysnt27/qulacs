@@ -297,6 +297,8 @@ if ((${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU") OR (${CMAKE_CXX_COMPILER_ID} STREQ
 		message(STATUS "SVE_FOUND = ${SVE_FOUND}")
 		if(USE_SIMD AND SVE_FOUND)
 			message(STATUS "SVE Enabled")
+			message(STATUS "USE_SIMD change to No")
+	                set(USE_SIMD No)
 			add_compile_options("-D _USE_SVE")
 		else()
 			message(STATUS "SVE Disabled")
@@ -321,6 +323,8 @@ if ((${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU") OR (${CMAKE_CXX_COMPILER_ID} STREQ
 	# Add optimization flags
 	set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} ${OPT_FLAGS}")
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${OPT_FLAGS}")
+	set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${OPT_FLAGS}")
+	set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${OPT_FLAGS}")
 
 	# Add coverage flags
 	if(COVERAGE)
